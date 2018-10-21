@@ -59,13 +59,13 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center_horizontal"
                                 android:text=""
-                                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                android:layout_marginBottom="15dp"
                                 android:textAppearance="@style/TextAppearance.AppCompat"
                                 android:textColor="@color/white"
                                 android:textSize="26sp"
                                 android:textStyle="bold"
                                 android:typeface="sans"
-                                android:fontFamily="@font/bangers"/>
+                                android:fontFamily="@font/roboto_bold"/>
 
                         <TextView
                                 android:layout_width="match_parent"
@@ -73,9 +73,9 @@
                                 android:textColor="@color/white"
                                 android:id="@+id/marvelInfo"
                                 android:textSize="22sp"
-                                android:layout_marginBottom="8dp"
+                                android:layout_marginBottom="10dp"
                                 android:text=""
-                                android:fontFamily="@font/bangers"/>
+                                android:fontFamily="@font/roboto_medium"/>
 
                         <TextView
                                 android:layout_width="match_parent"
@@ -84,16 +84,16 @@
                                 android:id="@+id/descriptionName"
                                 android:textColor="@color/white"
                                 android:text=""
-                                android:fontFamily="@font/bangers"/>
+                                android:fontFamily="@font/roboto"/>
 
                         <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/white"
                                 android:id="@+id/detailedInfo"
-                                android:layout_marginBottom="4dp"
+                                android:layout_marginBottom="8dp"
                                 android:text=""
-                                android:fontFamily="@font/bangers"/>
+                                android:fontFamily="@font/roboto_light"/>
 
                         <TextView
                                 android:id="@+id/link"
@@ -102,7 +102,7 @@
                                 android:layout_marginBottom="8dp"
                                 android:text=""
                                 android:gravity="center_horizontal"
-                                android:fontFamily="@font/bangers"/>
+                                android:fontFamily="@font/roboto_thin"/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -110,15 +110,24 @@
 
         </LinearLayout>
 
-        <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:backgroundTint="@color/white"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_search_black_24dp" />
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_margin="16dp"
+                android:layout_height="match_parent">
+
+            <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:backgroundTint="@color/white"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:visibility="invisible"
+                    android:src="@drawable/ic_search_black_24dp" />
+
+        </RelativeLayout>
+
 
     </RelativeLayout>
 

@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.hardware.SensorManager;
 import android.media.ExifInterface;
@@ -38,6 +39,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -115,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
     private static String marvelInfoString = "";
     private static String detailedInfoString = "";
     private static String descriptionNameString = "";
+    public static boolean isMarvel = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -369,6 +372,9 @@ public class MainActivity extends AppCompatActivity {
                 TextView mDetailedInfo = activity.findViewById(R.id.detailedInfo);
                 TextView mMarvelInfo = activity.findViewById(R.id.marvelInfo);
                 TextView mDescriptionName = activity.findViewById(R.id.descriptionName);
+                FloatingActionButton button = activity.findViewById(R.id.fab);
+
+                button.setVisibility(View.VISIBLE);
 
                 imageDetail.setText(result);
                 mMarvelInfo.setText(marvelInfoString);
@@ -377,6 +383,12 @@ public class MainActivity extends AppCompatActivity {
 
                 link.setMovementMethod(LinkMovementMethod.getInstance());
                 link.setText(Html.fromHtml(moreLink));
+
+                if (isMarvel) {
+                    Typeface tf = ResourcesCompat.getFont(activity.getBaseContext(), R.font.bangers);
+                    mMarvelInfo.setTypeface(tf);
+                    imageDetail.setTypeface(tf);
+                }
                 //link.setText(moreLink);
             }
         }
@@ -450,8 +462,9 @@ public class MainActivity extends AppCompatActivity {
                 //for (WebEntity entity : annotation.getWebEntities()) {
 //                    message.append(entity.getWebEntities().get(0).getDescription());
                 String name = annotation.getWebEntities().get(0).getDescription();
-
-                name = name.replaceAll(" ","%20");
+                if (name != null) {
+                    name = name.replaceAll(" ","%20");
+                }
                 //System.out.println(name);
 
                 long timeStamp = System.currentTimeMillis();
@@ -473,9 +486,9 @@ public class MainActivity extends AppCompatActivity {
                         int code = des.getInt("code");
                         if(code == 200 && des.getJSONObject("data").getInt("count") > 1) {
                             marvelInfo.append("This is a Marvel Character!");
+                            isMarvel = true;
                             descriptionName.append("Name: " + des.getJSONObject("data").getJSONArray("results").getJSONObject(0).optString("name"));
                             String descript = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getString("description");
-                            message.append("\n" + descript);
                             String wiki = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getJSONArray("urls").getJSONObject(1).getString("url");
                             StringBuilder urlStr = new StringBuilder();
                             urlStr.append("<a href=\"" + wiki + "\">More info here!</a>");
@@ -483,7 +496,8 @@ public class MainActivity extends AppCompatActivity {
                             description.append(descript);
                         } else {
                             descriptionName.append("Name: " + annotation.getWebEntities().get(0).getDescription());
-                            marvelInfo.append("No hero description found, but here's what I found with a quick Google search:");
+                            marvelInfo.append("Not a Marvel character, but here's what I found from Google:");
+                            isMarvel = false;
                             String searchURL = String.format("https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&q=%s&num=1", PRIVATE_SEARCH_API_KEY, SEARCH_CX_KEY, name);
                             try {
                                 String searchOutput = new Resty().text(searchURL).toString();
@@ -492,7 +506,9 @@ public class MainActivity extends AppCompatActivity {
                                     JSONArray searchItems = searchRes.getJSONArray("items");
                                     String snippet = searchItems.getJSONObject(0).getString("snippet").replaceAll("\\r\\n|\\r|\\n", "");
                                     description.append(snippet);
-                                    name = name.replaceAll("%20","+");
+                                    if (name != null) {
+                                        name = name.replaceAll("%20","+");
+                                    }
                                     StringBuilder urlStr = new StringBuilder();
                                     urlStr.append("<a href=\"https://www.google.com/search?q=" + name + "\">More info here!</a>");
                                     moreLink = urlStr.toString();
