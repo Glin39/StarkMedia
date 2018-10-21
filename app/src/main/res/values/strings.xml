@@ -5,7 +5,7 @@
     <string name="image_preview_header">Preview:</string>
     <string name="loading_message">Uploading your image...</string>
 
-    <string name="dialog_select_prompt">Import a picture </string>
+    <string name="dialog_select_prompt">Import a picture</string>
     <string name="dialog_select_camera">Camera</string>
     <string name="dialog_select_gallery">Gallery</string>
 
