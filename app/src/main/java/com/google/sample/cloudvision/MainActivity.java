@@ -373,12 +373,19 @@ public class MainActivity extends AppCompatActivity {
 
             //Fade
             ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(logo, View.ALPHA, 0.3f, .9f);
+            ObjectAnimator alphaAnimator1 = ObjectAnimator.ofFloat(logo, View.TRANSLATION_X, 40, -40);
 
             alphaAnimator.setDuration(650);
             alphaAnimator.setRepeatMode(ValueAnimator.REVERSE);
-            alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            alphaAnimator.setRepeatCount(10);
             alphaAnimator.start();
-        mLink.setText("");
+
+            alphaAnimator1.setDuration(1300);
+            alphaAnimator1.setRepeatMode(ValueAnimator.REVERSE);
+            alphaAnimator1.setRepeatCount(4);
+            alphaAnimator1.start();
+
+            mLink.setText("");
 
         // Do the real work in an async task, because we need to use the network anyway
         try {
@@ -431,7 +438,6 @@ public class MainActivity extends AppCompatActivity {
                 name = name.replaceAll(" ","%20");
                 //System.out.println(name);
 
-                message.append("Name: " + annotation.getWebEntities().get(0).getDescription());
                 long timeStamp = System.currentTimeMillis();
                 String tS = Long.toString(timeStamp);
 
@@ -440,16 +446,17 @@ public class MainActivity extends AppCompatActivity {
 
                 String url = String.format("http://gateway.marvel.com/v1/public/characters?nameStartsWith=%s&ts=%d&apikey=%s&hash=%s",
                         name, timeStamp, PUBLIC_MARVEL_API_KEY, hash);
-                System.out.println(url);
                 try {
                     String output = new Resty().text(url).toString();
                     try {
                         JSONObject des = new JSONObject(output);
                         int code = des.getInt("code");
                         if(code == 200 && des.getJSONObject("data").getInt("count") > 1) {
+                            message.append("Name: " + des.getJSONObject("data").getJSONArray("results").getJSONObject(0).optString("name"));
                             String descript = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getString("description");
                             message.append("\n" + descript);
                         } else {
+                            message.append("Name: " + annotation.getWebEntities().get(0).getDescription());
                             message.append("\n\nNo hero description found, but here's what I found with a quick Google search:");
                             String searchURL = String.format("https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&q=%s&num=1", PRIVATE_SEARCH_API_KEY, SEARCH_CX_KEY, name);
                             try {
