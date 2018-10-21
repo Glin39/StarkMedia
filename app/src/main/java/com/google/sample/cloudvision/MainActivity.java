@@ -38,6 +38,8 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.OrientationEventListener;
 import android.widget.ImageView;
@@ -85,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String CLOUD_VISION_API_KEY = BuildConfig.API_KEY;
     private static final String PUBLIC_MARVEL_API_KEY = BuildConfig.PUBLIC_MARVEL_API_KEY;
     private static final String PRIVATE_MARVEL_API_KEY = BuildConfig.PRIVATE_MARVEL_API_KEY;
+    private static final String PRIVATE_SEARCH_API_KEY = BuildConfig.PRIVATE_SEARCH_API_KEY;
+    private static final String SEARCH_CX_KEY = BuildConfig.SEARCH_CX_KEY;
     public static final String FILE_NAME = "temp.jpg";
     private static final String ANDROID_CERT_HEADER = "X-Android-Cert";
     private static final String ANDROID_PACKAGE_HEADER = "X-Android-Package";
@@ -99,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mImageDetails;
     private ImageView mMainImage;
+    private TextView mLink;
+    private static String moreLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mImageDetails = findViewById(R.id.image_details);
+        mLink = findViewById(R.id.link);
         mMainImage = findViewById(R.id.main_image);
     }
 
@@ -338,7 +345,12 @@ public class MainActivity extends AppCompatActivity {
             MainActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 TextView imageDetail = activity.findViewById(R.id.image_details);
+                TextView link = activity.findViewById(R.id.link);
                 imageDetail.setText(result);
+
+                link.setMovementMethod(LinkMovementMethod.getInstance());
+                link.setText(Html.fromHtml(moreLink));
+                //link.setText(moreLink);
             }
         }
     }
@@ -346,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
         private void callCloudVision(final Bitmap bitmap) {
         // Switch text to loading
         mImageDetails.setText(R.string.loading_message);
+        mLink.setText("");
 
         // Do the real work in an async task, because we need to use the network anyway
         try {
@@ -417,19 +430,19 @@ public class MainActivity extends AppCompatActivity {
                             String descript = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getString("description");
                             message.append("\n" + descript);
                         } else {
-                            message.append("\n\nNo hero description found, but here's what Google found:");
-                            String searchURL = String.format("https://www.googleapis.com/customsearch/v1?key=AIzaSyCf5YhLeQkax41MuOiQSSKCdcfjy36IB_Q&cx=008576030597144078525:hucpukkyh_0&q=%s&num=1", name);
+                            message.append("\n\nNo hero description found, but here's what I found with a quick Google search:");
+                            String searchURL = String.format("https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&q=%s&num=1", PRIVATE_SEARCH_API_KEY, SEARCH_CX_KEY, name);
                             try {
                                 String searchOutput = new Resty().text(searchURL).toString();
                                 try {
                                     JSONObject searchRes = new JSONObject(searchOutput);
                                     JSONArray searchItems = searchRes.getJSONArray("items");
-                                    String snippet = searchItems.getJSONObject(0).getString("snippet").replaceAll("\\r\\n|\\r|\\n", " ");
+                                    String snippet = searchItems.getJSONObject(0).getString("snippet").replaceAll("\\r\\n|\\r|\\n", "");
                                     message.append("\n" + snippet);
                                     name = name.replaceAll("%20","+");
                                     StringBuilder urlStr = new StringBuilder();
-                                    urlStr.append(" <a href=\"https://www.google.com/search?q=" + name + "\"</a>");
-                                    message.append(urlStr.toString());
+                                    urlStr.append("<a href=\"https://www.google.com/search?q=" + name + "\">More info here!</a>");
+                                    moreLink = urlStr.toString();
                                 } catch (JSONException e) {
                                     System.out.print("jSoN eXCepTIoN");
                                 }
