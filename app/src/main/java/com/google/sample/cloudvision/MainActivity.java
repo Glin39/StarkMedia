@@ -455,6 +455,10 @@ public class MainActivity extends AppCompatActivity {
                             message.append("Name: " + des.getJSONObject("data").getJSONArray("results").getJSONObject(0).optString("name"));
                             String descript = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getString("description");
                             message.append("\n" + descript);
+                            String wiki = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getJSONArray("urls").getJSONObject(1).getString("url");
+                            StringBuilder urlStr = new StringBuilder();
+                            urlStr.append("<a href=\"" + wiki + "\">More info here!</a>");
+                            moreLink = urlStr.toString();
                         } else {
                             message.append("Name: " + annotation.getWebEntities().get(0).getDescription());
                             message.append("\n\nNo hero description found, but here's what I found with a quick Google search:");
