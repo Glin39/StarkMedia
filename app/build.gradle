@@ -20,7 +20,8 @@ android {
             it.buildConfigField 'String', 'API_KEY', "\"AIzaSyD8koBB4whWRFnL9JVoRHp5DHpzJe8wiZo\""
             it.buildConfigField 'String', 'PUBLIC_MARVEL_API_KEY', "\"abde132cb2b298982ffd43c9fa565b8b\""
             it.buildConfigField 'String', 'PRIVATE_MARVEL_API_KEY', "\"033f7bae63e4110f2f59d17b9d00c888f5a9583c\""
-
+            it.buildConfigField 'String', 'PRIVATE_SEARCH_API_KEY', "\"AIzaSyDGYX1W8HXPEMJtXBL0o-OcZXhBr2x_gS8\""
+            it.buildConfigField 'String', 'SEARCH_CX_KEY', "\"008576030597144078525:hucpukkyh_0\""
         }
     }
     compileOptions {
