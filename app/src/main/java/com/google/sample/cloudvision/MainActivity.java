@@ -416,6 +416,9 @@ public class MainActivity extends AppCompatActivity {
 
 
             mLink.setText("");
+            mMarvelInfo.setText("");
+            mDescriptionName.setText("");
+            mDetailedInfo.setText("");
 
         // Do the real work in an async task, because we need to use the network anyway
         try {
