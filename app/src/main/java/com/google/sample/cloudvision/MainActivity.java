@@ -17,6 +17,8 @@
 package com.google.sample.cloudvision;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mImageDetails;
     private ImageView mMainImage;
     private TextView mLink;
-    private static String moreLink;
+    private static String moreLink = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        moreLink = "";
 
         if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             uploadImage(data.getData());
@@ -366,6 +369,15 @@ public class MainActivity extends AppCompatActivity {
         private void callCloudVision(final Bitmap bitmap) {
         // Switch text to loading
         mImageDetails.setText(R.string.loading_message);
+            ImageView logo = findViewById(R.id.main_image);
+
+            //Fade
+            ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(logo, View.ALPHA, 0.3f, .9f);
+
+            alphaAnimator.setDuration(650);
+            alphaAnimator.setRepeatMode(ValueAnimator.REVERSE);
+            alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            alphaAnimator.start();
         mLink.setText("");
 
         // Do the real work in an async task, because we need to use the network anyway

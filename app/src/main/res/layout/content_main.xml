@@ -40,7 +40,6 @@
                 android:layout_width="244dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
-                android:text="Import Photo:"
                 android:textAppearance="@style/TextAppearance.AppCompat"
                 android:textColor="@color/white"
                 android:textSize="26sp"
