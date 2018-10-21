@@ -18,44 +18,79 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <LinearLayout
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/activity_vertical_margin">
 
-            <ImageView
-                android:id="@+id/main_image"
-                android:layout_width="318dp"
-                android:layout_height="181dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="30dp"
-                android:scaleType="fitCenter" />
-
-            <TextView
-                android:id="@+id/image_details"
-                android:layout_width="244dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:text="Import Photo:"
-                android:textAppearance="@style/TextAppearance.AppCompat"
-                android:textColor="@color/white"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                android:typeface="sans" />
-                android:layout_marginBottom="8dp"
-                android:text="Import Photo:"/>
-
-            <TextView
-                android:id="@+id/link"
+        <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text=""/>
-        </LinearLayout>
-    </ScrollView>
+                android:layout_height="match_parent">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
+                    android:orientation="vertical">
+
+                <ImageView
+                        android:id="@+id/main_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="30dp"
+                        android:layout_gravity="center_horizontal"
+                        android:scaleType="fitCenter" />
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:id="@+id/image_details"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Import Photo:"
+                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                            android:textAppearance="@style/TextAppearance.AppCompat"
+                            android:textColor="@color/white"
+                            android:textSize="26sp"
+                            android:textStyle="bold"
+                            android:typeface="sans"
+                            android:fontFamily="@font/bangers"/>
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:id="@+id/marvelInfo"
+                            android:textSize="20sp"
+                            android:layout_marginBottom="8dp"
+                            android:text="This is a Marvel character!"
+                            android:fontFamily="@font/bangers"/>
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:id="@+id/detailedInfo"
+                            android:layout_marginBottom="4dp"
+                            android:text="Bitten by a radioactive spider, high school student peter parker becomes the spiderman and makes awkward finger guns at girls on the street while they look on in disgust. Sam Raimi takes on the darker side of spider man in Spiderman 3 pushing the limits of this beloved character and hero... or is he?"
+                            android:fontFamily="@font/bangers"/>
+
+                    <TextView
+                            android:id="@+id/link"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:text="www.urmom.com"
+                            android:fontFamily="@font/bangers"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
 
 </RelativeLayout>
