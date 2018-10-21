@@ -401,17 +401,13 @@ public class MainActivity extends AppCompatActivity {
 
             //Fade
             ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(logo, View.ALPHA, 0.3f, .9f);
-            ObjectAnimator alphaAnimator1 = ObjectAnimator.ofFloat(logo, View.TRANSLATION_X, 40, -40);
 
             alphaAnimator.setDuration(650);
             alphaAnimator.setRepeatMode(ValueAnimator.REVERSE);
-            alphaAnimator.setRepeatCount(10);
+            alphaAnimator.setRepeatCount(14);
             alphaAnimator.start();
 
-            alphaAnimator1.setDuration(1300);
-            alphaAnimator1.setRepeatMode(ValueAnimator.REVERSE);
-            alphaAnimator1.setRepeatCount(4);
-            alphaAnimator1.start();
+
 
             mLink.setText("");
 
