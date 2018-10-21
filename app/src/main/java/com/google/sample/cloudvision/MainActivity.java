@@ -17,6 +17,8 @@
 package com.google.sample.cloudvision;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +33,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -42,6 +45,7 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.OrientationEventListener;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -104,22 +108,30 @@ public class MainActivity extends AppCompatActivity {
     private TextView mImageDetails;
     private ImageView mMainImage;
     private TextView mLink;
-    private static String moreLink;
+    private static String moreLink = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder
-                    .setMessage(R.string.dialog_select_prompt)
-                    .setPositiveButton(R.string.dialog_select_gallery, (dialog, which) -> startGalleryChooser())
-                    .setNegativeButton(R.string.dialog_select_camera, (dialog, which) -> startCamera());
-            builder.create().show();
-        });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder
+                        .setMessage(R.string.dialog_select_prompt)
+                        .setPositiveButton(R.string.dialog_select_gallery, (dialog, which) -> startGalleryChooser())
+                        .setNegativeButton(R.string.dialog_select_camera, (dialog, which) -> startCamera())
+                        .setCancelable(false);
+                FloatingActionButton fab = findViewById(R.id.fab);
+                fab.setOnClickListener((View view) -> {
+                    builder.create().show();
+                });
+                AlertDialog alertdialog=builder.create();
+                alertdialog.show();
+            }
+        }, 5);
 
         mImageDetails = findViewById(R.id.image_details);
         mLink = findViewById(R.id.link);
@@ -158,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        moreLink = "";
 
         if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             uploadImage(data.getData());
@@ -356,7 +369,23 @@ public class MainActivity extends AppCompatActivity {
         private void callCloudVision(final Bitmap bitmap) {
         // Switch text to loading
         mImageDetails.setText(R.string.loading_message);
-        mLink.setText("");
+            ImageView logo = findViewById(R.id.main_image);
+
+            //Fade
+            ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(logo, View.ALPHA, 0.3f, .9f);
+            ObjectAnimator alphaAnimator1 = ObjectAnimator.ofFloat(logo, View.TRANSLATION_X, 40, -40);
+
+            alphaAnimator.setDuration(650);
+            alphaAnimator.setRepeatMode(ValueAnimator.REVERSE);
+            alphaAnimator.setRepeatCount(10);
+            alphaAnimator.start();
+
+            alphaAnimator1.setDuration(1300);
+            alphaAnimator1.setRepeatMode(ValueAnimator.REVERSE);
+            alphaAnimator1.setRepeatCount(4);
+            alphaAnimator1.start();
+
+            mLink.setText("");
 
         // Do the real work in an async task, because we need to use the network anyway
         try {
@@ -409,7 +438,6 @@ public class MainActivity extends AppCompatActivity {
                 name = name.replaceAll(" ","%20");
                 //System.out.println(name);
 
-                message.append("Name: " + annotation.getWebEntities().get(0).getDescription());
                 long timeStamp = System.currentTimeMillis();
                 String tS = Long.toString(timeStamp);
 
@@ -418,16 +446,17 @@ public class MainActivity extends AppCompatActivity {
 
                 String url = String.format("http://gateway.marvel.com/v1/public/characters?nameStartsWith=%s&ts=%d&apikey=%s&hash=%s",
                         name, timeStamp, PUBLIC_MARVEL_API_KEY, hash);
-                System.out.println(url);
                 try {
                     String output = new Resty().text(url).toString();
                     try {
                         JSONObject des = new JSONObject(output);
                         int code = des.getInt("code");
                         if(code == 200 && des.getJSONObject("data").getInt("count") > 1) {
+                            message.append("Name: " + des.getJSONObject("data").getJSONArray("results").getJSONObject(0).optString("name"));
                             String descript = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getString("description");
                             message.append("\n" + descript);
                         } else {
+                            message.append("Name: " + annotation.getWebEntities().get(0).getDescription());
                             message.append("\n\nNo hero description found, but here's what I found with a quick Google search:");
                             String searchURL = String.format("https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&q=%s&num=1", PRIVATE_SEARCH_API_KEY, SEARCH_CX_KEY, name);
                             try {
