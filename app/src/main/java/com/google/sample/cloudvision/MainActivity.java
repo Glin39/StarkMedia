@@ -106,9 +106,15 @@ public class MainActivity extends AppCompatActivity {
     public static final int CAMERA_IMAGE_REQUEST = 3;
 
     private TextView mImageDetails;
+    private TextView mMarvelInfo;
+    private TextView mDetailedInfo;
+    private TextView mDescriptionName;
     private ImageView mMainImage;
     private TextView mLink;
     private static String moreLink = "";
+    private static String marvelInfoString = "";
+    private static String detailedInfoString = "";
+    private static String descriptionNameString = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +142,9 @@ public class MainActivity extends AppCompatActivity {
         mImageDetails = findViewById(R.id.image_details);
         mLink = findViewById(R.id.link);
         mMainImage = findViewById(R.id.main_image);
+        mDetailedInfo = findViewById(R.id.detailedInfo);
+        mMarvelInfo = findViewById(R.id.marvelInfo);
+        mDescriptionName = findViewById(R.id.descriptionName);
     }
 
     public void startGalleryChooser() {
@@ -357,7 +366,14 @@ public class MainActivity extends AppCompatActivity {
             if (activity != null && !activity.isFinishing()) {
                 TextView imageDetail = activity.findViewById(R.id.image_details);
                 TextView link = activity.findViewById(R.id.link);
+                TextView mDetailedInfo = activity.findViewById(R.id.detailedInfo);
+                TextView mMarvelInfo = activity.findViewById(R.id.marvelInfo);
+                TextView mDescriptionName = activity.findViewById(R.id.descriptionName);
+
                 imageDetail.setText(result);
+                mMarvelInfo.setText(marvelInfoString);
+                mDescriptionName.setText(descriptionNameString);
+                mDetailedInfo.setText(detailedInfoString);
 
                 link.setMovementMethod(LinkMovementMethod.getInstance());
                 link.setText(Html.fromHtml(moreLink));
@@ -418,14 +434,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static String convertResponseToString(BatchAnnotateImagesResponse response) {
-        StringBuilder message = new StringBuilder("I found these things:\n\n");
+        StringBuilder message = new StringBuilder("I found these things");
 
         List<AnnotateImageResponse> responses = response.getResponses();
 
 
         for (AnnotateImageResponse res : responses) {
             if (res.getError() != null) {
-                System.out.printf("Error: %s\n", res.getError().getMessage());
+                System.out.printf("Error: %s", res.getError().getMessage());
                 message.append("nothing");
             } else {
                 WebDetection annotation = res.getWebDetection();
@@ -446,22 +462,27 @@ public class MainActivity extends AppCompatActivity {
 
                 String url = String.format("http://gateway.marvel.com/v1/public/characters?nameStartsWith=%s&ts=%d&apikey=%s&hash=%s",
                         name, timeStamp, PUBLIC_MARVEL_API_KEY, hash);
+
+                StringBuilder description = new StringBuilder();
+                StringBuilder marvelInfo = new StringBuilder();
+                StringBuilder descriptionName = new StringBuilder();
                 try {
                     String output = new Resty().text(url).toString();
                     try {
                         JSONObject des = new JSONObject(output);
                         int code = des.getInt("code");
                         if(code == 200 && des.getJSONObject("data").getInt("count") > 1) {
-                            message.append("Name: " + des.getJSONObject("data").getJSONArray("results").getJSONObject(0).optString("name"));
+                            descriptionName.append("Name: " + des.getJSONObject("data").getJSONArray("results").getJSONObject(0).optString("name"));
                             String descript = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getString("description");
                             message.append("\n" + descript);
                             String wiki = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getJSONArray("urls").getJSONObject(1).getString("url");
                             StringBuilder urlStr = new StringBuilder();
                             urlStr.append("<a href=\"" + wiki + "\">More info here!</a>");
                             moreLink = urlStr.toString();
+                            description.append(descript);
                         } else {
-                            message.append("Name: " + annotation.getWebEntities().get(0).getDescription());
-                            message.append("\n\nNo hero description found, but here's what I found with a quick Google search:");
+                            descriptionName.append("Name: " + annotation.getWebEntities().get(0).getDescription());
+                            marvelInfo.append("No hero description found, but here's what I found with a quick Google search:");
                             String searchURL = String.format("https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&q=%s&num=1", PRIVATE_SEARCH_API_KEY, SEARCH_CX_KEY, name);
                             try {
                                 String searchOutput = new Resty().text(searchURL).toString();
@@ -469,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
                                     JSONObject searchRes = new JSONObject(searchOutput);
                                     JSONArray searchItems = searchRes.getJSONArray("items");
                                     String snippet = searchItems.getJSONObject(0).getString("snippet").replaceAll("\\r\\n|\\r|\\n", "");
-                                    message.append("\n" + snippet);
+                                    description.append(snippet);
                                     name = name.replaceAll("%20","+");
                                     StringBuilder urlStr = new StringBuilder();
                                     urlStr.append("<a href=\"https://www.google.com/search?q=" + name + "\">More info here!</a>");
@@ -484,6 +505,10 @@ public class MainActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         System.out.print("jSoN eXCepTIoN");
                     }
+
+                    marvelInfoString = marvelInfo.toString();
+                    descriptionNameString = descriptionName.toString();
+                    detailedInfoString = description.toString();
                 } catch (IOException io) {
                     System.out.println("no");
                 }
