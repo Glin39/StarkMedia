@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String CLOUD_VISION_API_KEY = BuildConfig.API_KEY;
     private static final String PUBLIC_MARVEL_API_KEY = BuildConfig.PUBLIC_MARVEL_API_KEY;
     private static final String PRIVATE_MARVEL_API_KEY = BuildConfig.PRIVATE_MARVEL_API_KEY;
-    private static final String QUERY_URL = "https://gateway.marvel.com:443/v1/public/characters";
     public static final String FILE_NAME = "temp.jpg";
     private static final String ANDROID_CERT_HEADER = "X-Android-Cert";
     private static final String ANDROID_PACKAGE_HEADER = "X-Android-Package";

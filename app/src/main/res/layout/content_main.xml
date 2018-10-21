@@ -26,7 +26,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Use the floating action button to select an image."/>
+                android:text="Import Photo:"
+                android:textColor="white"/>
 
             <ImageView
                 android:id="@+id/main_image"
