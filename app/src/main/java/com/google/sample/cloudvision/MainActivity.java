@@ -472,6 +472,7 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject des = new JSONObject(output);
                         int code = des.getInt("code");
                         if(code == 200 && des.getJSONObject("data").getInt("count") > 1) {
+                            marvelInfo.append("This is a Marvel Character!");
                             descriptionName.append("Name: " + des.getJSONObject("data").getJSONArray("results").getJSONObject(0).optString("name"));
                             String descript = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getString("description");
                             description.append(descript);
