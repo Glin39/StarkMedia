@@ -33,6 +33,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -114,15 +115,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder
-                    .setMessage(R.string.dialog_select_prompt)
-                    .setPositiveButton(R.string.dialog_select_gallery, (dialog, which) -> startGalleryChooser())
-                    .setNegativeButton(R.string.dialog_select_camera, (dialog, which) -> startCamera());
-            builder.create().show();
-        });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder
+                        .setMessage(R.string.dialog_select_prompt)
+                        .setPositiveButton(R.string.dialog_select_gallery, (dialog, which) -> startGalleryChooser())
+                        .setNegativeButton(R.string.dialog_select_camera, (dialog, which) -> startCamera());
+                FloatingActionButton fab = findViewById(R.id.fab);
+                fab.setOnClickListener((View view) -> {
+                    builder.create().show();
+                });
+                AlertDialog alertdialog=builder.create();
+                alertdialog.show();
+            }
+        }, 10);
 
         mImageDetails = findViewById(R.id.image_details);
         mLink = findViewById(R.id.link);
