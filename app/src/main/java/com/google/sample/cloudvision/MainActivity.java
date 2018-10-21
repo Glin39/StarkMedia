@@ -122,13 +122,13 @@ public class MainActivity extends AppCompatActivity {
                 builder
                         .setMessage(R.string.dialog_select_prompt)
                         .setPositiveButton(R.string.dialog_select_gallery, (dialog, which) -> startGalleryChooser())
-                        .setNegativeButton(R.string.dialog_select_camera, (dialog, which) -> startCamera())
-                        .setCancelable(false);
+                        .setNegativeButton(R.string.dialog_select_camera, (dialog, which) -> startCamera());
                 FloatingActionButton fab = findViewById(R.id.fab);
                 fab.setOnClickListener((View view) -> {
+                    builder.setCancelable(true);
                     builder.create().show();
                 });
-                AlertDialog alertdialog=builder.create();
+                AlertDialog alertdialog=builder.setCancelable(false).create();
                 alertdialog.show();
             }
         }, 5);
