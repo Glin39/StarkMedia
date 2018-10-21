@@ -388,6 +388,12 @@ public class MainActivity extends AppCompatActivity {
                     Typeface tf = ResourcesCompat.getFont(activity.getBaseContext(), R.font.bangers);
                     mMarvelInfo.setTypeface(tf);
                     imageDetail.setTypeface(tf);
+                } else {
+                    Typeface tf1 = ResourcesCompat.getFont(activity.getBaseContext(), R.font.roboto_bold);
+                    Typeface tf2 = ResourcesCompat.getFont(activity.getBaseContext(), R.font.roboto_medium);
+
+                    imageDetail.setTypeface(tf1);
+                    imageDetail.setTypeface(tf2);
                 }
                 //link.setText(moreLink);
             }
