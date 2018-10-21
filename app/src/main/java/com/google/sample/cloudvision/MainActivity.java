@@ -17,10 +17,18 @@
 package com.google.sample.cloudvision;
 
 import android.Manifest;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.hardware.Camera;
+import android.hardware.SensorManager;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -31,6 +39,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.OrientationEventListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,12 +67,14 @@ import com.google.api.services.vision.v1.model.WebLabel;
 import com.google.api.services.vision.v1.model.WebPage;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -169,6 +180,44 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Rotate an image if required.
+     *
+     * @param img           The image bitmap
+     * @param selectedImage Image URI
+     * @return The resulted Bitmap after manipulation
+     */
+    private static Bitmap rotateImageIfRequired(Context context, Bitmap img, Uri selectedImage) throws IOException {
+
+        InputStream input = context.getContentResolver().openInputStream(selectedImage);
+        ExifInterface ei;
+        if (Build.VERSION.SDK_INT > 23)
+            ei = new ExifInterface(input);
+        else
+            ei = new ExifInterface(selectedImage.getPath());
+
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(img, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(img, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(img, 270);
+            default:
+                return img;
+        }
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
+    }
+
     public void uploadImage(Uri uri) {
         if (uri != null) {
             try {
@@ -177,6 +226,8 @@ public class MainActivity extends AppCompatActivity {
                         scaleBitmapDown(
                                 MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
                                 MAX_DIMENSION);
+
+                bitmap = rotateImageIfRequired(getApplicationContext(), bitmap, uri);
 
                 callCloudVision(bitmap);
                 mMainImage.setImageBitmap(bitmap);
@@ -362,11 +413,29 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         JSONObject des = new JSONObject(output);
                         int code = des.getInt("code");
-                        if(code == 200) {
+                        if(code == 200 && des.getJSONObject("data").getInt("count") > 1) {
                             String descript = des.getJSONObject("data").getJSONArray("results").getJSONObject(0).getString("description");
                             message.append("\n" + descript);
                         } else {
-                            message.append("No description found");
+                            message.append("\n\nNo hero description found, but here's what Google found:");
+                            String searchURL = String.format("https://www.googleapis.com/customsearch/v1?key=AIzaSyCf5YhLeQkax41MuOiQSSKCdcfjy36IB_Q&cx=008576030597144078525:hucpukkyh_0&q=%s&num=1", name);
+                            try {
+                                String searchOutput = new Resty().text(searchURL).toString();
+                                try {
+                                    JSONObject searchRes = new JSONObject(searchOutput);
+                                    JSONArray searchItems = searchRes.getJSONArray("items");
+                                    String snippet = searchItems.getJSONObject(0).getString("snippet").replaceAll("\\r\\n|\\r|\\n", " ");
+                                    message.append("\n" + snippet);
+                                    name = name.replaceAll("%20","+");
+                                    StringBuilder urlStr = new StringBuilder();
+                                    urlStr.append(" <a href=\"https://www.google.com/search?q=" + name + "\"</a>");
+                                    message.append(urlStr.toString());
+                                } catch (JSONException e) {
+                                    System.out.print("jSoN eXCepTIoN");
+                                }
+                            } catch (IOException e) {
+                                System.out.println("Google died");
+                            }
                         }
                     } catch (JSONException e) {
                         System.out.print("jSoN eXCepTIoN");
